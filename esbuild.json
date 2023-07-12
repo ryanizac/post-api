@@ -1,0 +1,8 @@
+{
+  "entryPoints": ["src/server.ts"],
+  "outfile": "dist/server.js",
+  "bundle": true,
+  "packages": "external",
+  "target": ["node16"],
+  "format": "cjs"
+}
