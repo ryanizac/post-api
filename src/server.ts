@@ -1,1 +1,11 @@
-console.log("hello, server");
+import "dotenv/config";
+import { createServer } from "./factories";
+
+async function main() {
+  const PORT = process.env.PORT || 3000;
+  const server = createServer();
+
+  server.start(PORT);
+}
+
+main();
