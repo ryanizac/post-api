@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { createServer } from "./factories";
+import { createServer } from "./main";
 
 async function main() {
   const PORT = process.env.PORT || 3000;
