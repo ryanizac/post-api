@@ -1,6 +1,7 @@
 import { User } from "../entities";
 import { ClientError } from "../errors";
 import { IdGenerator, UserRepository } from "./ports";
+import { CreateUserArgsValidator } from "./validators";
 
 export class CreateUser {
   private readonly idGenerator: IdGenerator;
@@ -11,7 +12,13 @@ export class CreateUser {
     this.userRepository = ports.userRepository;
   }
 
-  async execute(args: CreateUser.Args): Promise<CreateUser.Result> {
+  async execute(raw: CreateUser.Args): Promise<CreateUser.Result> {
+    const args = CreateUserArgsValidator.validate(raw);
+
+    if (args instanceof Error) {
+      throw new ClientError(args.message);
+    }
+
     const { name, email, password } = args;
 
     const exists = await this.userRepository.exists(email);
