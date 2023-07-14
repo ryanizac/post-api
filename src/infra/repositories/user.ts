@@ -21,4 +21,11 @@ export class UserPrismaRepository implements UserRepository {
     });
     return !!found;
   }
+
+  async findById(id: string): Promise<UserRepository.Data | null> {
+    const found = await db.user.findFirst({
+      where: { id },
+    });
+    return found;
+  }
 }

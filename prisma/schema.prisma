@@ -17,4 +17,15 @@ model User {
   name     String
   email    String
   password String
+  posts    Post[]
+}
+
+model Post {
+  id       String   @id
+  createAt DateTime
+  updateAt DateTime
+  title    String
+  content  String
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String
 }
