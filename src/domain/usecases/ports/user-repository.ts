@@ -2,6 +2,7 @@ export type UserRepository = {
   exists(email: string): Promise<boolean>;
   create(data: UserRepository.Data): Promise<void>;
   findById(id: string): Promise<UserRepository.Data | null>;
+  findByEmail(email: string): Promise<UserRepository.Data | null>;
 };
 
 export namespace UserRepository {
