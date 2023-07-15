@@ -28,4 +28,11 @@ export class UserPrismaRepository implements UserRepository {
     });
     return found;
   }
+
+  async findByEmail(email: string): Promise<UserRepository.Data | null> {
+    const found = await db.user.findFirst({
+      where: { email },
+    });
+    return found;
+  }
 }
