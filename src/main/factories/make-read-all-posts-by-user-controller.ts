@@ -4,6 +4,7 @@ import {
   ReadAllPostsByUserController,
   UserPrismaRepository,
 } from "../../infra";
+import { ReadAllPostsByUserCache } from "../caches";
 
 export function makeReadAllPostsByUserController() {
   const userRepository = new UserPrismaRepository();
@@ -12,7 +13,8 @@ export function makeReadAllPostsByUserController() {
     userRepository,
     postRepository,
   });
-  const controller = new ReadAllPostsByUserController(usecase);
+  const cachePolicy = new ReadAllPostsByUserCache();
+  const controller = new ReadAllPostsByUserController(usecase, cachePolicy);
 
   return controller;
 }
