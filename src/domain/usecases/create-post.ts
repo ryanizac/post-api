@@ -40,6 +40,12 @@ export class CreatePost {
 
     const { content, title, userId } = args;
 
+    if (authValidation.id !== userId) {
+      throw new ClientError(
+        "It is not possible to create a post for a different user",
+      );
+    }
+
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new ClientError("User not found");
