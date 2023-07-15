@@ -3,12 +3,18 @@ import {
   LoginController,
   UserPrismaRepository,
   JWTGenerator,
+  BcryptPassword,
 } from "../../infra";
 
 export function makeLoginController() {
   const authGenerator = new JWTGenerator();
   const userRepository = new UserPrismaRepository();
-  const usecase = new Login({ userRepository, authGenerator });
+  const passwordEncryptor = new BcryptPassword();
+  const usecase = new Login({
+    userRepository,
+    authGenerator,
+    passwordEncryptor,
+  });
   const controller = new LoginController(usecase);
 
   return controller;
