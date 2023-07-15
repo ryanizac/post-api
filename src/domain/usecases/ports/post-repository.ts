@@ -1,6 +1,11 @@
 export type PostRepository = {
   exists(title: string): Promise<boolean>;
   create(data: PostRepository.Data): Promise<void>;
+  findAllByUserId(
+    userId: string,
+    pagination: number,
+    take: number,
+  ): Promise<PostRepository.Data[]>;
 };
 
 export namespace PostRepository {

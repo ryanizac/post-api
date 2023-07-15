@@ -15,4 +15,19 @@ export namespace StringValidator {
 
     return value;
   }
+
+  export function optional(
+    value: any,
+    key: string,
+  ): GenericValidator.Validation<string | undefined> {
+    if (GenericValidator.isEmpty(value)) {
+      return undefined;
+    }
+
+    if (typeof value !== "string") {
+      return { error: `The ${key} must be a string` };
+    }
+
+    return value;
+  }
 }

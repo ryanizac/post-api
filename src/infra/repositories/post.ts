@@ -21,4 +21,19 @@ export class PostPrismaRepository implements PostRepository {
     });
     return !!found;
   }
+
+  async findAllByUserId(
+    userId: string,
+    pagination: number,
+    take: number,
+  ): Promise<PostRepository.Data[]> {
+    const skip = pagination * take - take;
+    const list = await db.post.findMany({
+      where: { userId },
+      orderBy: { createAt: "asc" },
+      skip,
+      take,
+    });
+    return list;
+  }
 }
