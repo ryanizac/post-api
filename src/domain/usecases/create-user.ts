@@ -1,15 +1,17 @@
 import { User } from "../entities";
 import { ClientError } from "../errors";
-import { IdGenerator, UserRepository } from "./ports";
+import { IdGenerator, PasswordEncryptor, UserRepository } from "./ports";
 import { CreateUserArgsValidator } from "./validators";
 
 export class CreateUser {
   private readonly idGenerator: IdGenerator;
   private readonly userRepository: UserRepository;
+  private readonly passwordEncryptor: PasswordEncryptor;
 
   constructor(ports: CreateUser.Ports) {
     this.idGenerator = ports.idGenerator;
     this.userRepository = ports.userRepository;
+    this.passwordEncryptor = ports.passwordEncryptor;
   }
 
   async execute(raw: CreateUser.Args): Promise<CreateUser.Result> {
@@ -19,7 +21,7 @@ export class CreateUser {
       throw new ClientError(args.message);
     }
 
-    const { name, email, password } = args;
+    const { name, email, password: initialPassword } = args;
 
     const exists = await this.userRepository.exists(email);
 
@@ -30,6 +32,7 @@ export class CreateUser {
     const id = this.idGenerator.generate();
     const createAt = new Date();
     const updateAt = createAt;
+    const password = await this.passwordEncryptor.encrypt(initialPassword);
 
     const user = new User({
       id,
@@ -52,6 +55,7 @@ export namespace CreateUser {
   export type Ports = {
     idGenerator: IdGenerator;
     userRepository: UserRepository;
+    passwordEncryptor: PasswordEncryptor;
   };
 
   export type Args = {
