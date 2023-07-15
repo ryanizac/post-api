@@ -13,4 +13,29 @@ export class JWTGenerator implements AuthGenerator {
 
     return { token };
   }
+
+  async check(auth: Auth): Promise<Auth.Payload | AuthGenerator.CheckError> {
+    const secretKey = this.secretKey;
+    const expiresIn = this.expiresIn;
+
+    try {
+      const payload = jwt.verify(auth.token, secretKey);
+      return payload as Auth.Payload;
+    } catch (error) {
+      if (error instanceof Error) {
+        const message = error.message;
+
+        if (
+          message.includes("jwt malformed") ||
+          message.includes("invalid signature")
+        ) {
+          return { error: "invalid token" };
+        }
+      }
+
+      return {
+        error: "error validating token",
+      };
+    }
+  }
 }

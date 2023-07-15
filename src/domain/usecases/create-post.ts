@@ -1,20 +1,37 @@
 import { Post } from "../entities";
 import { ClientError } from "../errors";
-import { IdGenerator, PostRepository, UserRepository } from "./ports";
+import { Auth } from "../structs";
+import {
+  AuthGenerator,
+  IdGenerator,
+  PostRepository,
+  UserRepository,
+} from "./ports";
 import { CreatePostArgsValidator } from "./validators";
 
 export class CreatePost {
   private readonly userRepository: UserRepository;
   private readonly postRepository: PostRepository;
   private readonly idGenerator: IdGenerator;
+  private readonly authGenerator: AuthGenerator;
 
   constructor(ports: CreatePost.Ports) {
     this.userRepository = ports.userRepository;
     this.postRepository = ports.postRepository;
     this.idGenerator = ports.idGenerator;
+    this.authGenerator = ports.authGenerator;
   }
 
-  async execute(rawArgs: CreatePost.Args): Promise<CreatePost.Result> {
+  async execute(
+    rawArgs: CreatePost.Args,
+    auth: Auth,
+  ): Promise<CreatePost.Result> {
+    const authValidation = await this.authGenerator.check(auth);
+
+    if ("error" in authValidation) {
+      throw new ClientError(authValidation.error);
+    }
+
     const args = CreatePostArgsValidator.validate(rawArgs);
 
     if (args instanceof Error) {
@@ -59,6 +76,7 @@ export namespace CreatePost {
     userRepository: UserRepository;
     postRepository: PostRepository;
     idGenerator: IdGenerator;
+    authGenerator: AuthGenerator;
   };
 
   export type Args = {
