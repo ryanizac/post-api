@@ -1,20 +1,19 @@
 import { ReadAllPostsByUser } from "../../domain";
-import { CacheUseCase } from "../../infra";
+import { PostsCache } from "../../infra";
 import { MappedCache, redis } from "./common";
 
-export class ReadAllPostsByUserCache
-  implements CacheUseCase<ReadAllPostsByUser>
-{
+export class ReadAllPostsByUserCache implements PostsCache {
   private readonly base = MappedCache.POSTS;
 
-  private mountKey({ userId, pagination }: ReadAllPostsByUser.Args) {
+  private mountKey(userId: string, pagination: number | string) {
     return `${this.base}-${userId}-${pagination}`;
   }
 
   async get(
-    args: ReadAllPostsByUser.Args,
+    userId: string,
+    pagination: number,
   ): Promise<ReadAllPostsByUser.Result | null> {
-    const key = this.mountKey(args);
+    const key = this.mountKey(userId, pagination);
     const result = await redis.get(key);
 
     if (!result) {
@@ -25,10 +24,11 @@ export class ReadAllPostsByUserCache
   }
 
   async set(
-    args: ReadAllPostsByUser.Args,
+    userId: string,
+    pagination: number,
     data: ReadAllPostsByUser.Result,
   ): Promise<void> {
-    const key = this.mountKey(args);
+    const key = this.mountKey(userId, pagination);
     await redis.set(key, JSON.stringify(data));
   }
 }

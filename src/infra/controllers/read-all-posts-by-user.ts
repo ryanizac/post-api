@@ -1,22 +1,27 @@
 import { ClientError, ReadAllPostsByUser } from "../../domain";
-import { GenericController, Http, CacheUseCase } from "./common";
+import { GenericController, Http } from "./common";
+import { PostsCache } from "./ports";
 
 export class ReadAllPostsByUserController implements GenericController {
   constructor(
     private readonly readAllPostsByUser: ReadAllPostsByUser,
-    private readonly cachePolicy: CacheUseCase<ReadAllPostsByUser>,
+    private readonly cachePolicy: PostsCache,
   ) {}
 
   async handle({ params, query }: Http.Request): Promise<Http.Response> {
     try {
-      const args = { userId: params.userId, pagination: query.pagination };
-      const dataInCache = await this.cachePolicy.get(args);
+      const { userId } = params;
+      const { pagination } = query;
+      const dataInCache = await this.cachePolicy.get(userId, pagination);
       if (dataInCache) {
         return { code: 200, data: dataInCache };
       }
 
-      const data = await this.readAllPostsByUser.execute(args);
-      await this.cachePolicy.set(args, data);
+      const data = await this.readAllPostsByUser.execute({
+        userId,
+        pagination,
+      });
+      await this.cachePolicy.set(userId, pagination, data);
       return { code: 200, data };
     } catch (error) {
       if (error instanceof ClientError) {
