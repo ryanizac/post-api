@@ -6,6 +6,7 @@ import {
   UserPrismaRepository,
   JWTGenerator,
 } from "../../infra";
+import { ReadAllPostsByUserCache } from "../caches";
 
 export function makeCreatePostController() {
   const idGenerator = new UuidGenerator();
@@ -18,7 +19,8 @@ export function makeCreatePostController() {
     postRepository,
     authGenerator,
   });
-  const controller = new CreatePostController(usecase);
+  const postCache = new ReadAllPostsByUserCache();
+  const controller = new CreatePostController(usecase, postCache);
 
   return controller;
 }

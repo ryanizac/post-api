@@ -31,4 +31,10 @@ export class ReadAllPostsByUserCache implements PostsCache {
     const key = this.mountKey(userId, pagination);
     await redis.set(key, JSON.stringify(data));
   }
+
+  async clear(userId: string): Promise<void> {
+    const pattern = this.mountKey(userId, "*");
+    const allKeysInRedis = await redis.keys(pattern);
+    await redis.del(...allKeysInRedis);
+  }
 }

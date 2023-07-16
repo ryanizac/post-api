@@ -10,4 +10,5 @@ export type PostsCache = {
     pagination: number,
     data: ReadAllPostsByUser.Result,
   ): Promise<void>;
+  clear(userId: string): Promise<void>;
 };
